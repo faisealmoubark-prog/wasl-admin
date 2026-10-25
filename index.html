@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>وَصْل | لوحة التحكم</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg:#0b0f0c; --surface:#141a15; --raised:#1c241e; --line:#2a342c; --fg:#f0ebe0; --muted:#8f9a90; --brass:#d4a84b; --ok:#3ecf8e; --danger:#e15a48; --radius:14px; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:"IBM Plex Sans Arabic",system-ui,sans-serif; background:var(--bg); color:var(--fg); min-height:100dvh; }
+    .login-screen { min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:1.5rem; }
+    .login-box { width:100%; max-width:380px; background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:2rem; }
+    .login-box h1 { font-size:1.5rem; color:var(--brass); margin-bottom:0.35rem; }
+    .login-box .sub { color:var(--muted); font-size:0.85rem; margin-bottom:1.5rem; }
+    label { display:block; font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    input { width:100%; padding:0.65rem 0.85rem; border-radius:10px; border:1px solid var(--line); background:var(--raised); color:var(--fg); font-size:0.9rem; outline:none; margin-bottom:1rem; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; padding:0.6rem 1.1rem; border-radius:10px; font-size:0.875rem; font-weight:500; border:none; cursor:pointer; font-family:inherit; }
+    .btn-primary { background:var(--brass); color:#1a1408; width:100%; }
+    .btn-secondary { background:var(--raised); color:var(--fg); border:1px solid var(--line); }
+    .hidden { display:none !important; }
+    .layout { display:flex; min-height:100dvh; }
+    .sidebar { width:260px; background:var(--surface); border-left:1px solid var(--line); padding:1rem; }
+    .brand h1 { color:var(--brass); font-size:1.35rem; }
+    .nav-item { display:block; width:100%; text-align:right; padding:0.7rem 0.9rem; border-radius:10px; color:var(--muted); background:transparent; border:none; cursor:pointer; margin-bottom:0.25rem; font-family:inherit; }
+    .nav-item.active { background:color-mix(in oklab, var(--brass) 15%, transparent); color:var(--brass); }
+    .main { flex:1; padding:1.75rem 2rem; }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; }
+    .stat-value { font-size:1.75rem; font-weight:700; color:var(--brass); }
+    .toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); background:var(--raised); border:1px solid var(--line); padding:0.75rem 1.25rem; border-radius:999px; opacity:0; transition:opacity 0.25s; }
+    .toast.show { opacity:1; }
+  </style>
+</head>
+<body>
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box">
+      <h1>وَصْل أدمن</h1>
+      <p class="sub">لوحة تحكم المطور والأدوات</p>
+      <label>كلمة المرور</label>
+      <input type="password" id="loginPass" placeholder="أدخل كلمة المرور" />
+      <button class="btn btn-primary" id="loginBtn">دخول</button>
+      <p style="font-size:0.75rem;color:var(--muted);margin-top:1rem;text-align:center">الافتراضي: <code>wasl2026</code></p>
+    </div>
+  </div>
+  <div class="layout hidden" id="appLayout">
+    <aside class="sidebar">
+      <div class="brand"><h1>وَصْل</h1><p style="color:var(--muted);font-size:0.75rem">لوحة التحكم</p></div>
+      <nav style="margin-top:1rem">
+        <button class="nav-item active" data-page="dashboard">نظرة عامة</button>
+        <button class="nav-item" data-page="wasl">تحكم وَصْل</button>
+        <button class="nav-item" data-page="features">الميزات</button>
+        <button class="nav-item" data-page="share">مشاركة</button>
+        <button class="nav-item" data-page="settings">إعدادات</button>
+      </nav>
+      <button class="btn btn-secondary" style="margin-top:1rem;width:100%" id="logoutBtn">خروج</button>
+    </aside>
+    <main class="main">
+      <section id="page-dashboard">
+        <h2>نظرة عامة</h2>
+        <div class="card"><div class="stat-value" id="statFeatures">6</div><div>ميزات مفعّلة</div></div>
+        <div class="card">
+          <h3>إجراءات سريعة</h3>
+          <button class="btn btn-primary" id="btnExport" style="margin-top:0.5rem">تصدير الإعدادات</button>
+        </div>
+      </section>
+      <section id="page-wasl" class="hidden">
+        <h2>تحكم وَصْل</h2>
+        <div class="card">
+          <label>رابط أداة وَصْل</label>
+          <input type="text" id="waslUrl" placeholder="https://..." />
+          <button class="btn btn-primary" id="btnSaveUrl" style="margin-top:0.5rem">حفظ</button>
+        </div>
+      </section>
+      <section id="page-features" class="hidden">
+        <h2>الميزات</h2>
+        <div class="card" id="featuresList"></div>
+      </section>
+      <section id="page-share" class="hidden">
+        <h2>مشاركة</h2>
+        <div class="card">
+          <label>اسم المشارك</label>
+          <input type="text" id="shareName" />
+          <button class="btn btn-primary" id="btnCreateShare" style="margin-top:0.5rem">إنشاء رابط</button>
+          <div id="shareResult" style="margin-top:1rem;word-break:break-all"></div>
+        </div>
+      </section>
+      <section id="page-settings" class="hidden">
+        <h2>إعدادات</h2>
+        <div class="card">
+          <label>كلمة مرور جديدة</label>
+          <input type="password" id="newPass" />
+          <button class="btn btn-primary" id="btnChangePass" style="margin-top:0.5rem">حفظ</button>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="admin.js"></script>
+</body>
+</html>
